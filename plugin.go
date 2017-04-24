@@ -51,9 +51,9 @@ func (p Plugin) Exec() error {
 		Body: &p.Message,
 	}
 
-	client.Issues.CreateComment(ctx, p.RepoOwner, p.RepoName, p.PullRequestNum, ic)
+	_, _, err = client.Issues.CreateComment(ctx, p.RepoOwner, p.RepoName, p.PullRequestNum, ic)
 
-	return nil
+	return err
 }
 
 func validate(p Plugin) error {
