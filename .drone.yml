@@ -1,0 +1,12 @@
+workspace:
+  base: /go
+  path: src/github.com/jmccann/drone-gh-pr-comment
+
+pipeline:
+  build:
+    image: golang:1.8
+    environment:
+      - CGO_ENABLED=0
+    commands:
+      - go test -cover -coverprofile=coverage.out
+      - go build -ldflags "-s -w -X main.revision=$(git rev-parse HEAD)" -a
