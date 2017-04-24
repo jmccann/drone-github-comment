@@ -32,6 +32,11 @@ func main() {
 			Usage:  "api url, needs to be changed for ghe",
 			EnvVar: "PLUGIN_BASE_URL,GITHUB_BASE_URL",
 		},
+		cli.IntFlag{
+			Name:   "issue-num",
+			Usage:  "Issue #",
+			EnvVar: "PLUGIN_ISSUE_NUM,DRONE_PULL_REQUEST",
+		},
 		cli.StringFlag{
 			Name:   "message",
 			Usage:  "github token",
@@ -43,12 +48,6 @@ func main() {
 		//
 
 		cli.StringFlag{
-			Name:   "build-event",
-			Value:  "pull_request",
-			Usage:  "build event",
-			EnvVar: "DRONE_BUILD_EVENT",
-		},
-		cli.StringFlag{
 			Name:   "repo-name",
 			Usage:  "repository name",
 			EnvVar: "DRONE_REPO_NAME",
@@ -57,11 +56,6 @@ func main() {
 			Name:   "repo-owner",
 			Usage:  "repository owner",
 			EnvVar: "DRONE_REPO_OWNER",
-		},
-		cli.IntFlag{
-			Name:   "pull-request",
-			Usage:  "pull request #",
-			EnvVar: "DRONE_PULL_REQUEST",
 		},
 	}
 
@@ -76,13 +70,12 @@ func run(c *cli.Context) error {
 	}).Info("Drone Github PR Plugin Version")
 
 	plugin := Plugin{
-		BaseURL:        c.String("base-url"),
-		BuildEvent:     c.String("build-event"),
-		Message:        c.String("message"),
-		PullRequestNum: c.Int("pull-request"),
-		RepoName:       c.String("repo-name"),
-		RepoOwner:      c.String("repo-owner"),
-		Token:          c.String("api-key"),
+		BaseURL:    c.String("base-url"),
+		Message:    c.String("message"),
+		IssueNum:   c.Int("pull-request"),
+		RepoName:   c.String("repo-name"),
+		RepoOwner:  c.String("repo-owner"),
+		Token:      c.String("api-key"),
 	}
 
 	return plugin.Exec()

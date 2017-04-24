@@ -1,6 +1,6 @@
 workspace:
   base: /go
-  path: src/github.com/jmccann/drone-gh-pr-comment
+  path: src/github.com/jmccann/drone-github-comment
 
 pipeline:
   build:

@@ -12,13 +12,12 @@ import (
 
 type (
 	Plugin struct {
-		BaseURL        string
-		BuildEvent     string
-		Message        string
-		PullRequestNum int
-		RepoName       string
-		RepoOwner      string
-		Token          string
+		BaseURL    string
+		Message    string
+		IssueNum   int
+		RepoName   string
+		RepoOwner  string
+		Token      string
 	}
 )
 
@@ -51,16 +50,12 @@ func (p Plugin) Exec() error {
 		Body: &p.Message,
 	}
 
-	_, _, err = client.Issues.CreateComment(ctx, p.RepoOwner, p.RepoName, p.PullRequestNum, ic)
+	_, _, err = client.Issues.CreateComment(ctx, p.RepoOwner, p.RepoName, p.IssueNum, ic)
 
 	return err
 }
 
 func validate(p Plugin) error {
-	if p.BuildEvent != "pull_request" {
-		return fmt.Errorf("The GitHub PR plugin is only available for pull reuqests")
-	}
-
 	if p.Token == "" {
 		return fmt.Errorf("You must provide an API key")
 	}
