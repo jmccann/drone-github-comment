@@ -9,5 +9,5 @@ RUN apk update && \
     ca-certificates && \
   rm -rf /var/cache/apk/*
 
-ADD drone-gh-pr-comment /bin/
-ENTRYPOINT ["/bin/drone-gh-pr-comment"]
+ADD drone-github-comment /bin/
+ENTRYPOINT ["/bin/drone-github-comment"]

@@ -11,8 +11,8 @@ var revision string // build number set at compile-time
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "github pr comment plugin"
-	app.Usage = "github pr comment plugin"
+	app.Name = "github comment plugin"
+	app.Usage = "github comment plugin"
 	app.Action = run
 	app.Version = revision
 	app.Flags = []cli.Flag{
@@ -67,7 +67,7 @@ func main() {
 func run(c *cli.Context) error {
 	logrus.WithFields(logrus.Fields{
 		"Revision": revision,
-	}).Info("Drone Github PR Plugin Version")
+	}).Info("Drone Github Comment Plugin Version")
 
 	plugin := Plugin{
 		BaseURL:    c.String("base-url"),
