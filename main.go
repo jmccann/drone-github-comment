@@ -72,7 +72,7 @@ func run(c *cli.Context) error {
 	plugin := Plugin{
 		BaseURL:    c.String("base-url"),
 		Message:    c.String("message"),
-		IssueNum:   c.Int("pull-request"),
+		IssueNum:   c.Int("issue-num"),
 		RepoName:   c.String("repo-name"),
 		RepoOwner:  c.String("repo-owner"),
 		Token:      c.String("api-key"),
