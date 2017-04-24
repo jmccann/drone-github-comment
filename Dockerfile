@@ -1,6 +1,6 @@
 # Docker image for the Drone GH PR Comment plugin
 #
-#     docker build -t jmccann/drone-gh-pr-comment .
+#     docker build -t jmccann/drone-github-comment .
 
 FROM alpine:3.5
 
