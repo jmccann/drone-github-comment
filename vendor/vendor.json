@@ -25,6 +25,12 @@
 			"revisionTime": "2017-03-17T14:32:14Z"
 		},
 		{
+			"checksumSHA1": "PT+f0dSgI/NEFidixhuWXU52HVM=",
+			"path": "github.com/franela/goblin",
+			"revision": "cd5d08fb4ede9eaac1812fdb513552e7404eae2e",
+			"revisionTime": "2018-04-07T13:27:55Z"
+		},
+		{
 			"checksumSHA1": "kBeNcaKk56FguvPSUCEaH6AxpRc=",
 			"path": "github.com/golang/protobuf/proto",
 			"revision": "2bba0603135d7d7f5cb73b2125beeda19c09f4ef",
@@ -131,7 +137,13 @@
 			"path": "google.golang.org/appengine/urlfetch",
 			"revision": "170382fa85b10b94728989dfcf6cc818b335c952",
 			"revisionTime": "2017-04-10T19:43:55Z"
+		},
+		{
+			"checksumSHA1": "d7piEuKOhY/jda7dF0O826rkekY=",
+			"path": "gopkg.in/h2non/gock.v1",
+			"revision": "550b7ca3aa563b9974e2391274ea55a940d05ca9",
+			"revisionTime": "2018-02-28T17:00:15Z"
 		}
 	],
-	"rootPath": "github.com/jmccann/drone-gh-pr-comment"
+	"rootPath": "github.com/jmccann/drone-github-comment"
 }
