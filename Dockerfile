@@ -2,12 +2,35 @@
 #
 #     docker build -t jmccann/drone-github-comment .
 
-FROM alpine:3.5
+#
+# Run testing and build binary
+#
+
+FROM golang:1.8-alpine AS builder
+
+# set working directory
+RUN mkdir -p /go/src/drone-github-comment
+WORKDIR /go/src/drone-github-comment
+
+# copy sources
+COPY . .
+
+# run tests
+RUN go test -v
+
+# build binary
+RUN go build -v -o "/drone-github-comment"
+
+#
+# Build the image
+#
+
+FROM alpine:3.7
 
 RUN apk update && \
   apk add \
     ca-certificates && \
   rm -rf /var/cache/apk/*
 
-ADD drone-github-comment /bin/
+COPY --from=builder /drone-github-comment /bin/drone-github-comment
 ENTRYPOINT ["/bin/drone-github-comment"]
