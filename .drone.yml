@@ -3,10 +3,13 @@ workspace:
   path: src/github.com/jmccann/drone-github-comment
 
 pipeline:
-  build:
+  test:
     image: golang:1.8
-    environment:
-      - CGO_ENABLED=0
     commands:
-      - go test -cover -coverprofile=coverage.out
-      - go build -ldflags "-s -w -X main.revision=$(git rev-parse HEAD)" -a
+      - go test -cover
+
+  build:
+    when:
+      local: false
+    image: plugins/docker:17.05
+    repo: jmccann/drone-github-comment
