@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"os"
 
 	"github.com/Sirupsen/logrus"
@@ -39,8 +40,13 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:   "message",
-			Usage:  "github token",
+			Usage:  "comment message",
 			EnvVar: "PLUGIN_MESSAGE",
+		},
+		cli.StringFlag{
+			Name:   "message-file",
+			Usage:  "comment message read from file",
+			EnvVar: "PLUGIN_MESSAGE_FILE",
 		},
 
 		//
@@ -69,9 +75,23 @@ func run(c *cli.Context) error {
 		"Revision": revision,
 	}).Info("Drone Github Comment Plugin Version")
 
+	// Read message from file
+	message := c.String("message")
+	if message == "" {
+		if _, err := os.Stat(c.String("message-file")); err == nil {
+			dat, err := ioutil.ReadFile(c.String("message-file"))
+
+			if err != nil {
+				return err
+			}
+
+			message = string(dat)
+		}
+	}
+
 	plugin := Plugin{
 		BaseURL:    c.String("base-url"),
-		Message:    c.String("message"),
+		Message:    message,
 		IssueNum:   c.Int("issue-num"),
 		RepoName:   c.String("repo-name"),
 		RepoOwner:  c.String("repo-owner"),
