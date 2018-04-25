@@ -28,6 +28,16 @@ func main() {
 			EnvVar: "PLUGIN_API_KEY,GITHUB_RELEASE_API_KEY,GITHUB_TOKEN",
 		},
 		cli.StringFlag{
+			Name:   "username",
+			Usage:  "basic auth username",
+			EnvVar: "PLUGIN_USERNAME,GITHUB_GITHUB_USERNAME,DRONE_NETRC_USERNAME",
+		},
+		cli.StringFlag{
+			Name:   "password",
+			Usage:  "basic auth password",
+			EnvVar: "PLUGIN_PASSWORD,GITHUB_PASSWORD,DRONE_NETRC_PASSWORD",
+		},
+		cli.StringFlag{
 			Name:   "base-url",
 			Value:  "https://api.github.com/",
 			Usage:  "api url, needs to be changed for ghe",
@@ -104,10 +114,12 @@ func run(c *cli.Context) error {
 		Key:       c.String("key"),
 		Message:   message,
 		IssueNum:  c.Int("issue-num"),
+		Password:  c.String("password"),
 		RepoName:  c.String("repo-name"),
 		RepoOwner: c.String("repo-owner"),
 		Token:     c.String("api-key"),
 		Update:    c.Bool("update"),
+		Username:  c.String("username"),
 	}
 
 	return plugin.Exec()

@@ -17,9 +17,11 @@ type (
 		IssueNum       int
 		Key            string
 		Message        string
+		Password       string
 		RepoName       string
 		RepoOwner      string
 		Update         bool
+		Username       string
 		Token          string
 	}
 )
@@ -42,11 +44,18 @@ func (p Plugin) Exec() error {
 	}
 
 	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: p.Token})
-	tc := oauth2.NewClient(ctx, ts)
-
-	client := github.NewClient(tc)
-
+	var client *github.Client
+	if p.Token != "" {
+		ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: p.Token})
+		tc := oauth2.NewClient(ctx, ts)
+		client = github.NewClient(tc)
+	} else {
+		tp := github.BasicAuthTransport{
+			Username: strings.TrimSpace(p.Username),
+			Password: strings.TrimSpace(p.Password),
+		}
+		client = github.NewClient(tp.Client())
+	}
 	client.BaseURL = baseURL
 
 	// Generate default plugin key if not specified
@@ -117,8 +126,8 @@ func filterComment(comments []*github.IssueComment, key string) int {
 }
 
 func validate(p Plugin) error {
-	if p.Token == "" {
-		return fmt.Errorf("You must provide an API key")
+	if p.Token == "" && (p.Username == "" || p.Password == "") {
+		return fmt.Errorf("You must provide an API key or Username and Password")
 	}
 
 	return nil
