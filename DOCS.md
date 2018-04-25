@@ -37,7 +37,7 @@ pipeline:
     when:
       event: pull_request
     image: jmccann/drone-github-comment:1
--   update: true
+-   message: Hello World!
 +   message_file: comment.file
 ```
 
