@@ -54,14 +54,14 @@ func (p Plugin) Exec() error {
 		p.ID = commentID(p)
 	}
 
-	// Append plugin comment ID to comment message so we can search for it later
-	message := fmt.Sprintf("%s\n<!-- id: %s -->\n", p.Message, p.ID)
-
 	ic := &github.IssueComment{
-		Body: &message,
+		Body: &p.Message,
 	}
 
 	if p.UpdateExisting {
+		// Append plugin comment ID to comment message so we can search for it later
+		message := fmt.Sprintf("%s\n<!-- id: %s -->\n", p.Message, p.ID)
+		ic.Body = &message
 		comments, err := allIssueComments(ctx, client, p)
 
 		if err != nil {
