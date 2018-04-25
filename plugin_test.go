@@ -101,6 +101,12 @@ func TestPlugin(t *testing.T) {
 			g.Assert(gock.IsDone()).IsFalse()
 		})
 
+		g.It("generate comment id", func() {
+			id := commentID(p)
+
+			g.Assert(id).Equal("e056c5655126a83191821948eef7db35762dd9bde43441524aacf3fbfba0ef17")
+		})
+
 		g.It("injects comment id", func() {
 			gock.New("http://server.com").
 			Get("repos/test-org/test-repo/issues/12/comments").

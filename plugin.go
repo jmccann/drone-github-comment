@@ -51,9 +51,7 @@ func (p Plugin) Exec() error {
 
 	// Generate plugin comment ID if not specified
 	if p.ID == "" {
-		key := fmt.Sprintf("%s/%s/%s", p.RepoOwner, p.RepoName, p.IssueNum)
-		hash := sha256.Sum256([]byte(key))
-		p.ID = string(hash[:sha256.Size])
+		p.ID = commentID(p)
 	}
 
 	// Append plugin comment ID to comment message so we can search for it later
@@ -100,6 +98,12 @@ func allIssueComments(ctx context.Context, client *github.Client, p Plugin) ([]*
 	}
 
 	return allComments, nil
+}
+
+func commentID(p Plugin) string {
+	key := fmt.Sprintf("%s/%s/%d", p.RepoOwner, p.RepoName, p.IssueNum)
+	hash := sha256.Sum256([]byte(key))
+	return fmt.Sprintf("%x", hash)
 }
 
 func filterComment(comments []*github.IssueComment, id string) int {
