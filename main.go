@@ -39,6 +39,11 @@ func main() {
 			EnvVar: "PLUGIN_ISSUE_NUM,DRONE_PULL_REQUEST",
 		},
 		cli.StringFlag{
+			Name: "key",
+			Usage: "key to assign comment",
+			EnvVar: "PLUGIN_KEY",
+		},
+		cli.StringFlag{
 			Name:   "message",
 			Usage:  "comment message",
 			EnvVar: "PLUGIN_MESSAGE",
@@ -47,6 +52,11 @@ func main() {
 			Name:   "message-file",
 			Usage:  "comment message read from file",
 			EnvVar: "PLUGIN_MESSAGE_FILE",
+		},
+		cli.BoolFlag{
+			Name: "update",
+			Usage: "update an existing comment that matches the key",
+			EnvVar: "PLUGIN_UPDATE",
 		},
 
 		//
@@ -90,12 +100,14 @@ func run(c *cli.Context) error {
 	}
 
 	plugin := Plugin{
-		BaseURL:    c.String("base-url"),
-		Message:    message,
-		IssueNum:   c.Int("issue-num"),
-		RepoName:   c.String("repo-name"),
-		RepoOwner:  c.String("repo-owner"),
-		Token:      c.String("api-key"),
+		BaseURL:   c.String("base-url"),
+		Key:       c.String("key"),
+		Message:   message,
+		IssueNum:  c.Int("issue-num"),
+		RepoName:  c.String("repo-name"),
+		RepoOwner: c.String("repo-owner"),
+		Token:     c.String("api-key"),
+		Update:    c.Bool("update"),
 	}
 
 	return plugin.Exec()

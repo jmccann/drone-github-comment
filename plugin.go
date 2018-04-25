@@ -14,12 +14,12 @@ import (
 type (
 	Plugin struct {
 		BaseURL        string
-		ID             string
 		IssueNum       int
+		Key            string
 		Message        string
 		RepoName       string
 		RepoOwner      string
-		UpdateExisting bool
+		Update         bool
 		Token          string
 	}
 )
@@ -49,18 +49,18 @@ func (p Plugin) Exec() error {
 
 	client.BaseURL = baseURL
 
-	// Generate plugin comment ID if not specified
-	if p.ID == "" {
-		p.ID = commentID(p)
+	// Generate default plugin key if not specified
+	if p.Key == "" {
+		p.Key = defaultKey(p)
 	}
 
 	ic := &github.IssueComment{
 		Body: &p.Message,
 	}
 
-	if p.UpdateExisting {
+	if p.Update {
 		// Append plugin comment ID to comment message so we can search for it later
-		message := fmt.Sprintf("%s\n<!-- id: %s -->\n", p.Message, p.ID)
+		message := fmt.Sprintf("%s\n<!-- id: %s -->\n", p.Message, p.Key)
 		ic.Body = &message
 		comments, err := allIssueComments(ctx, client, p)
 
@@ -68,7 +68,7 @@ func (p Plugin) Exec() error {
 			return err
 		}
 
-		commentID := filterComment(comments, p.ID)
+		commentID := filterComment(comments, p.Key)
 
 		if commentID != 0 {
 			_, _, err = client.Issues.EditComment(ctx, p.RepoOwner, p.RepoName, commentID, ic)
@@ -100,15 +100,15 @@ func allIssueComments(ctx context.Context, client *github.Client, p Plugin) ([]*
 	return allComments, nil
 }
 
-func commentID(p Plugin) string {
+func defaultKey(p Plugin) string {
 	key := fmt.Sprintf("%s/%s/%d", p.RepoOwner, p.RepoName, p.IssueNum)
 	hash := sha256.Sum256([]byte(key))
 	return fmt.Sprintf("%x", hash)
 }
 
-func filterComment(comments []*github.IssueComment, id string) int {
+func filterComment(comments []*github.IssueComment, key string) int {
 	for _, comment := range comments {
-		if strings.Contains(*comment.Body, fmt.Sprintf("<!-- id: %s -->", id)) {
+		if strings.Contains(*comment.Body, fmt.Sprintf("<!-- id: %s -->", key)) {
 			return *comment.ID
 		}
 	}

@@ -36,12 +36,12 @@ func TestPlugin(t *testing.T) {
 	g.Describe("updates existing comment", func() {
 		p := Plugin{
 			BaseURL:        "http://server.com",
-			ID:             "123",
 			Message:        "test message",
 			IssueNum:       12,
+			Key:            "123",
 			RepoName:       "test-repo",
 			RepoOwner:      "test-org",
-			UpdateExisting: true,
+			Update:         true,
 			Token:          "fake",
 		}
 
@@ -101,13 +101,13 @@ func TestPlugin(t *testing.T) {
 			g.Assert(gock.IsDone()).IsFalse()
 		})
 
-		g.It("generate comment id", func() {
-			id := commentID(p)
+		g.It("generate comment key", func() {
+			id := defaultKey(p)
 
 			g.Assert(id).Equal("e056c5655126a83191821948eef7db35762dd9bde43441524aacf3fbfba0ef17")
 		})
 
-		g.It("injects comment id", func() {
+		g.It("injects comment key", func() {
 			gock.New("http://server.com").
 			Get("repos/test-org/test-repo/issues/12/comments").
 			Reply(200).
