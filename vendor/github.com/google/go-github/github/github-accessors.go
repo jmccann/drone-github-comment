@@ -3117,6 +3117,14 @@ func (o *OrganizationEvent) GetAction() string {
 }
 
 // GetAction returns the Action field if it's non-nil, zero value otherwise.
+func (o *OrgBlockEvent) GetAction() string {
+	if o == nil || o.Action == nil {
+		return ""
+	}
+	return *o.Action
+}
+
+// GetAction returns the Action field if it's non-nil, zero value otherwise.
 func (p *Page) GetAction() string {
 	if p == nil || p.Action == nil {
 		return ""
@@ -6626,6 +6634,14 @@ func (t *TreeEntry) GetType() string {
 		return ""
 	}
 	return *t.Type
+}
+
+// GetURL returns the URL field if it's non-nil, zero value otherwise.
+func (t *TreeEntry) GetURL() string {
+	if t == nil || t.URL == nil {
+		return ""
+	}
+	return *t.URL
 }
 
 // GetForce returns the Force field if it's non-nil, zero value otherwise.
