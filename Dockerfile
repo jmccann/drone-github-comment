@@ -6,7 +6,7 @@
 # Run testing and build binary
 #
 
-FROM golang:1.8-alpine AS builder
+FROM golang:1.10-alpine AS builder
 
 # set working directory
 RUN mkdir -p /go/src/github.com/jmccann/drone-github-comment
