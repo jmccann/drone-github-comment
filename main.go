@@ -4,6 +4,8 @@ import (
 	"io/ioutil"
 	"os"
 
+	p "github.com/jmccann/drone-github-comment/plugin"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/urfave/cli"
 )
@@ -109,7 +111,7 @@ func run(c *cli.Context) error {
 		}
 	}
 
-	plugin := Plugin{
+	plugin := p.Plugin{
 		BaseURL:   c.String("base-url"),
 		Key:       c.String("key"),
 		Message:   message,

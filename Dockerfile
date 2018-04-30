@@ -9,14 +9,14 @@
 FROM golang:1.8-alpine AS builder
 
 # set working directory
-RUN mkdir -p /go/src/drone-github-comment
-WORKDIR /go/src/drone-github-comment
+RUN mkdir -p /go/src/github.com/jmccann/drone-github-comment
+WORKDIR /go/src/github.com/jmccann/drone-github-comment
 
 # copy sources
 COPY . .
 
 # run tests
-RUN go test -v
+RUN go test -v ./...
 
 # build binary
 RUN go build -v -o "/drone-github-comment"

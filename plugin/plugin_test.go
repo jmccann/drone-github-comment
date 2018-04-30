@@ -1,4 +1,4 @@
-package main
+package plugin
 
 import (
 	"fmt"
@@ -49,7 +49,7 @@ func TestPlugin(t *testing.T) {
 			gock.New("http://server.com").
 			Get("repos/test-org/test-repo/issues/12/comments").
 			Reply(200).
-			File("testdata/response/non-existing-comment.json")
+			File("../testdata/response/non-existing-comment.json")
 
 			gock.New("http://server.com").
 			Post("repos/test-org/test-repo/issues/12/comments").
@@ -65,7 +65,7 @@ func TestPlugin(t *testing.T) {
 			gock.New("http://server.com").
 			Get("repos/test-org/test-repo/issues/12/comments").
 			Reply(200).
-			File("testdata/response/existing-comment.json")
+			File("../testdata/response/existing-comment.json")
 
 			gock.New("http://server.com").
 			Patch("repos/test-org/test-repo/issues/comments/7").
@@ -82,7 +82,7 @@ func TestPlugin(t *testing.T) {
 			gock.New("http://server.com").
 			Get("repos/test-org/test-repo/issues/12/comments").
 			Reply(200).
-			File("testdata/response/existing-comment.json")
+			File("../testdata/response/existing-comment.json")
 
 			// We do not expect this endpoint to get called
 			gock.New("http://server.com").
@@ -111,13 +111,13 @@ func TestPlugin(t *testing.T) {
 			gock.New("http://server.com").
 			Get("repos/test-org/test-repo/issues/12/comments").
 			Reply(200).
-			File("testdata/response/existing-comment.json")
+			File("../testdata/response/existing-comment.json")
 
 			gock.New("http://server.com").
 			Patch("repos/test-org/test-repo/issues/comments/7").
 			MatchType("json").
 			// Make sure we are sending expected generated message
-			File("testdata/request/patch-comment.json").
+			File("../testdata/request/patch-comment.json").
 			Reply(201).
 			JSON(map[string]string{})
 
