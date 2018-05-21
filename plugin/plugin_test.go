@@ -20,6 +20,10 @@ func TestPlugin(t *testing.T) {
 			RepoOwner: "test-org",
 			Token:     "fake",
 		}
+		err := p.InitGitClient()
+		if err != nil {
+			t.Fail()
+		}
 
 		g.It("creates a new comment", func() {
 			gock.New("http://server.com").
@@ -28,7 +32,6 @@ func TestPlugin(t *testing.T) {
 			JSON(map[string]string{})
 
 			err := p.Exec()
-
 			g.Assert(err == nil).IsTrue(fmt.Sprintf("Received err: %s", err))
 		})
 	})
@@ -43,6 +46,10 @@ func TestPlugin(t *testing.T) {
 			RepoOwner:      "test-org",
 			Update:         true,
 			Token:          "fake",
+		}
+		err := p.InitGitClient()
+		if err != nil {
+			t.Fail()
 		}
 
 		g.It("creates a new comment if one does not exist", func() {
@@ -95,7 +102,9 @@ func TestPlugin(t *testing.T) {
 			Reply(200).
 			JSON(map[string]string{})
 
-			p.Exec()
+			err := p.Exec()
+
+			g.Assert(err == nil).IsTrue(fmt.Sprintf("Received err: %s", err))
 
 			// Make sure we didn't process all API calls mocked
 			g.Assert(gock.IsDone()).IsFalse()

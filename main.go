@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	p "github.com/jmccann/drone-github-comment/plugin"
+	"github.com/jmccann/drone-github-comment/plugin"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/urfave/cli"
@@ -111,18 +111,11 @@ func run(c *cli.Context) error {
 		}
 	}
 
-	plugin := p.Plugin{
-		BaseURL:   c.String("base-url"),
-		Key:       c.String("key"),
-		Message:   message,
-		IssueNum:  c.Int("issue-num"),
-		Password:  c.String("password"),
-		RepoName:  c.String("repo-name"),
-		RepoOwner: c.String("repo-owner"),
-		Token:     c.String("api-key"),
-		Update:    c.Bool("update"),
-		Username:  c.String("username"),
+	p, err := plugin.NewFromCLI(c)
+	if err != nil {
+		return err
 	}
+	p.Message = message
 
-	return plugin.Exec()
+	return p.Exec()
 }

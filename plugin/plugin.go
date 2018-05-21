@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/google/go-github/github"
+	"github.com/urfave/cli"
 	"golang.org/x/oauth2"
 )
 
@@ -29,18 +30,30 @@ type (
 	}
 )
 
-// Exec executes the plugin
-func (p Plugin) Exec() error {
+func NewFromCLI(c *cli.Context) (*Plugin, error) {
+	p := Plugin{
+		BaseURL:   c.String("base-url"),
+		Key:       c.String("key"),
+		Message:   c.String("message"),
+		IssueNum:  c.Int("issue-num"),
+		Password:  c.String("password"),
+		RepoName:  c.String("repo-name"),
+		RepoOwner: c.String("repo-owner"),
+		Token:     c.String("api-key"),
+		Update:    c.Bool("update"),
+		Username:  c.String("username"),
+	}
+
 	err := validate(p)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	err = p.newGitClient()
+	err = p.InitGitClient()
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Generate default plugin key if not specified
@@ -48,10 +61,16 @@ func (p Plugin) Exec() error {
 		p.Key = defaultKey(p)
 	}
 
+	return &p, nil
+}
+
+// Exec executes the plugin
+func (p Plugin) Exec() error {
 	ic := &github.IssueComment{
 		Body: &p.Message,
 	}
 
+	var err error
 	if p.Update {
 		// Append plugin comment ID to comment message so we can search for it later
 		message := fmt.Sprintf("%s\n<!-- id: %s -->\n", p.Message, p.Key)
@@ -63,7 +82,7 @@ func (p Plugin) Exec() error {
 			return err
 		}
 
-		if *comment.ID != 0 {
+		if comment != nil {
 			_, _, err = p.gitClient.Issues.EditComment(p.gitContext, p.RepoOwner, p.RepoName, *comment.ID, ic)
 			return err
 		}
@@ -73,7 +92,7 @@ func (p Plugin) Exec() error {
 	return err
 }
 
-func (p Plugin) newGitClient() error {
+func (p *Plugin) InitGitClient() error {
 	if !strings.HasSuffix(p.BaseURL, "/") {
 		p.BaseURL = p.BaseURL + "/"
 	}
