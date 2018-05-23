@@ -44,21 +44,20 @@ func NewFromCLI(c *cli.Context) (*Plugin, error) {
 		Username:  c.String("username"),
 	}
 
-	err := validate(p)
+	err := p.init()
 
 	if err != nil {
 		return nil, err
 	}
 
-	err = p.InitGitClient()
+	return &p, nil
+}
+
+func NewFromPlugin(p Plugin) (*Plugin, error) {
+	err := p.init()
 
 	if err != nil {
 		return nil, err
-	}
-
-	// Generate default plugin key if not specified
-	if p.Key == "" {
-		p.Key = defaultKey(p)
 	}
 
 	return &p, nil
@@ -66,6 +65,10 @@ func NewFromCLI(c *cli.Context) (*Plugin, error) {
 
 // Exec executes the plugin
 func (p Plugin) Exec() error {
+	if p.gitClient == nil {
+		return fmt.Errorf("Exec(): git client not initialized")
+	}
+
 	ic := &github.IssueComment{
 		Body: &p.Message,
 	}
@@ -92,7 +95,28 @@ func (p Plugin) Exec() error {
 	return err
 }
 
-func (p *Plugin) InitGitClient() error {
+func (p *Plugin) init() error {
+	err := p.validate()
+
+	if err != nil {
+		return err
+	}
+
+	err = p.initGitClient()
+
+	if err != nil {
+		return err
+	}
+
+	// Generate default plugin key if not specified
+	if p.Key == "" {
+		p.Key = defaultKey(*p)
+	}
+
+	return nil
+}
+
+func (p *Plugin) initGitClient() error {
 	if !strings.HasSuffix(p.BaseURL, "/") {
 		p.BaseURL = p.BaseURL + "/"
 	}
@@ -133,6 +157,10 @@ func (p Plugin) Comment() (*github.IssueComment, error) {
 }
 
 func (p Plugin) allIssueComments(ctx context.Context) ([]*github.IssueComment, error) {
+	if p.gitClient == nil {
+		return nil, fmt.Errorf("allIssueComments(): git client not initialized")
+	}
+
 	opts := &github.IssueListCommentsOptions{}
 
 	// get all pages of results
@@ -168,7 +196,7 @@ func filterComment(comments []*github.IssueComment, key string) *github.IssueCom
 	return nil
 }
 
-func validate(p Plugin) error {
+func (p Plugin) validate() error {
 	if p.Token == "" && (p.Username == "" || p.Password == "") {
 		return fmt.Errorf("You must provide an API key or Username and Password")
 	}
