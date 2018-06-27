@@ -1,8 +1,8 @@
 package plugin
 
 import (
-	"crypto/sha256"
 	"context"
+	"crypto/sha256"
 	"fmt"
 	"net/url"
 	"strings"
@@ -14,19 +14,19 @@ import (
 
 type (
 	Plugin struct {
-		BaseURL        string
-		IssueNum       int
-		Key            string
-		Message        string
-		Password       string
-		RepoName       string
-		RepoOwner      string
-		Update         bool
-		Username       string
-		Token          string
+		BaseURL   string
+		IssueNum  int
+		Key       string
+		Message   string
+		Password  string
+		RepoName  string
+		RepoOwner string
+		Update    bool
+		Username  string
+		Token     string
 
-		gitClient      *github.Client
-		gitContext     context.Context
+		gitClient  *github.Client
+		gitContext context.Context
 	}
 )
 
@@ -86,7 +86,7 @@ func (p Plugin) Exec() error {
 		}
 
 		if comment != nil {
-			_, _, err = p.gitClient.Issues.EditComment(p.gitContext, p.RepoOwner, p.RepoName, *comment.ID, ic)
+			_, _, err = p.gitClient.Issues.EditComment(p.gitContext, p.RepoOwner, p.RepoName, int(*comment.ID), ic)
 			return err
 		}
 	}

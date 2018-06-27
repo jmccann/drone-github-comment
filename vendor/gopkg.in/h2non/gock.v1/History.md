@@ -1,4 +1,9 @@
 
+## v1.0.9 / 2018-06-14
+
+  * fix(url-encoding) add exact match test in MatchPath (#34)
+  * fix(travis): use string notation for Go versions
+
 ## v1.0.8 / 2018-02-28
 
   * chore(LICENSE): update year ;)
