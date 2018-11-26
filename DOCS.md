@@ -43,12 +43,21 @@ pipeline:
 
 # Parameter Reference
 
-key
-: Override generate comment key to use when updating existing comments.
-For PRs if this is not provided it's generated automatically.
+#### `key`
+Override generated comment key to use when updating existing comments.
+For PRs, if this is not provided, it's generated automatically.
 
-message_file
-: Path to file to read for message to post
+#### `message`
+The message to post.
 
-update
-: Update existing comment based on `key`.
+#### `message_file`
+Path to file to read for message to post.
+
+#### `update`
+Update existing comment based on `key`. Defaults to `false`.
+
+#### `base_url`
+GitHub Base API Url. Example: `https://git.target.com/api/v3`. Defaults to `https://api.github.com`.
+
+#### `api_key`
+GitHub API Key.
