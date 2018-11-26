@@ -57,7 +57,7 @@ Path to file to read for message to post.
 Update existing comment based on `key`. Defaults to `false`.
 
 #### `base_url`
-GitHub Base API Url. Example: `https://git.target.com/api/v3`. Defaults to `https://api.github.com`.
+GitHub Base API Url. Example: `https://some.git.com/api/v3`. Defaults to `https://api.github.com`.
 
 #### `api_key`
 GitHub API Key.
