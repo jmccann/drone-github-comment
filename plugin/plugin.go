@@ -21,6 +21,7 @@ type (
 		Password  string
 		RepoName  string
 		RepoOwner string
+		CommitSha string
 		Update    bool
 		Username  string
 		Token     string
@@ -39,6 +40,7 @@ func NewFromCLI(c *cli.Context) (*Plugin, error) {
 		Password:  c.String("password"),
 		RepoName:  c.String("repo-name"),
 		RepoOwner: c.String("repo-owner"),
+		CommitSha: c.String("commit-sha"),
 		Token:     c.String("api-key"),
 		Update:    c.Bool("update"),
 		Username:  c.String("username"),
@@ -74,6 +76,18 @@ func (p Plugin) Exec() error {
 	}
 
 	var err error
+
+	if p.IssueNum == 0 {
+		p.IssueNum, err = p.getPullRequestNumber(p.gitContext)
+		if err != nil {
+			return err
+		}
+		if p.IssueNum == 0 && err == nil {
+			fmt.Println("Pull request number not found")
+			return nil
+		}
+	}
+
 	if p.Update {
 		// Append plugin comment ID to comment message so we can search for it later
 		message := fmt.Sprintf("%s\n<!-- id: %s -->\n", p.Message, p.Key)
@@ -202,4 +216,16 @@ func (p Plugin) validate() error {
 	}
 
 	return nil
+}
+
+func (p Plugin) getPullRequestNumber(ctx context.Context) (int, error) {
+	res, _, err := p.gitClient.Search.Issues(ctx, fmt.Sprintf("%s repo:%s/%s", p.CommitSha, p.RepoOwner, p.RepoName), nil)
+	if err != nil {
+		return 0, err
+	}
+	if len(res.Issues) == 0 {
+		return 0, nil
+	}
+
+	return *res.Issues[0].Number, nil
 }

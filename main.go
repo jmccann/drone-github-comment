@@ -51,8 +51,8 @@ func main() {
 			EnvVar: "PLUGIN_ISSUE_NUM,DRONE_PULL_REQUEST",
 		},
 		cli.StringFlag{
-			Name: "key",
-			Usage: "key to assign comment",
+			Name:   "key",
+			Usage:  "key to assign comment",
 			EnvVar: "PLUGIN_KEY",
 		},
 		cli.StringFlag{
@@ -66,8 +66,8 @@ func main() {
 			EnvVar: "PLUGIN_MESSAGE_FILE",
 		},
 		cli.BoolFlag{
-			Name: "update",
-			Usage: "update an existing comment that matches the key",
+			Name:   "update",
+			Usage:  "update an existing comment that matches the key",
 			EnvVar: "PLUGIN_UPDATE",
 		},
 
@@ -84,6 +84,11 @@ func main() {
 			Name:   "repo-owner",
 			Usage:  "repository owner",
 			EnvVar: "DRONE_REPO_OWNER",
+		},
+		cli.StringFlag{
+			Name:   "commit-sha",
+			Usage:  "git commit SHA",
+			EnvVar: "DRONE_COMMIT_SHA",
 		},
 	}
 
