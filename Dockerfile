@@ -6,7 +6,7 @@
 # Run testing and build binary
 #
 
-FROM golang:1.10-alpine AS builder
+FROM golang:1.14 AS builder
 
 # set working directory
 RUN mkdir -p /go/src/github.com/jmccann/drone-github-comment
@@ -15,11 +15,15 @@ WORKDIR /go/src/github.com/jmccann/drone-github-comment
 # copy sources
 COPY . .
 
+RUN go get -d -v ./...
+
+RUN go install -v ./...
+
 # run tests
 RUN go test -v ./...
 
 # build binary
-RUN go build -v -o "/drone-github-comment"
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -o "/drone-github-comment"
 
 #
 # Build the image
