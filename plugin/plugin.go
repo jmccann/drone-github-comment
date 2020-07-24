@@ -14,16 +14,17 @@ import (
 
 type (
 	Plugin struct {
-		BaseURL   string
-		IssueNum  int
-		Key       string
-		Message   string
-		Password  string
-		RepoName  string
-		RepoOwner string
-		Update    bool
-		Username  string
-		Token     string
+		BaseURL      string
+		IssueNum     int
+		Key          string
+		Message      string
+		Password     string
+		RepoName     string
+		RepoOwner    string
+		Update       bool
+		DeleteCreate bool
+		Username     string
+		Token        string
 
 		gitClient  *github.Client
 		gitContext context.Context
@@ -32,16 +33,17 @@ type (
 
 func NewFromCLI(c *cli.Context) (*Plugin, error) {
 	p := Plugin{
-		BaseURL:   c.String("base-url"),
-		Key:       c.String("key"),
-		Message:   c.String("message"),
-		IssueNum:  c.Int("issue-num"),
-		Password:  c.String("password"),
-		RepoName:  c.String("repo-name"),
-		RepoOwner: c.String("repo-owner"),
-		Token:     c.String("api-key"),
-		Update:    c.Bool("update"),
-		Username:  c.String("username"),
+		BaseURL:      c.String("base-url"),
+		Key:          c.String("key"),
+		Message:      c.String("message"),
+		IssueNum:     c.Int("issue-num"),
+		Password:     c.String("password"),
+		RepoName:     c.String("repo-name"),
+		RepoOwner:    c.String("repo-owner"),
+		Token:        c.String("api-key"),
+		Update:       c.Bool("update"),
+		DeleteCreate: c.Bool("delete_create"),
+		Username:     c.String("username"),
 	}
 
 	err := p.init()
@@ -65,6 +67,7 @@ func NewFromPlugin(p Plugin) (*Plugin, error) {
 
 // Exec executes the plugin
 func (p Plugin) Exec() error {
+	fmt.Println("exec1")
 	if p.gitClient == nil {
 		return fmt.Errorf("Exec(): git client not initialized")
 	}
@@ -75,6 +78,7 @@ func (p Plugin) Exec() error {
 
 	var err error
 	if p.Update {
+		fmt.Println("update")
 		// Append plugin comment ID to comment message so we can search for it later
 		message := fmt.Sprintf("%s\n<!-- id: %s -->\n", p.Message, p.Key)
 		ic.Body = &message
@@ -91,6 +95,29 @@ func (p Plugin) Exec() error {
 		}
 	}
 
+	if p.DeleteCreate {
+		fmt.Println("delete")
+		// Append plugin comment ID to comment message so we can search for it later
+		message := fmt.Sprintf("%s\n<!-- id: %s -->\n", p.Message, p.Key)
+		ic.Body = &message
+
+		comment, err := p.Comment()
+
+		if err != nil {
+			return err
+		}
+
+		if comment != nil {
+			_, err = p.gitClient.Issues.DeleteComment(p.gitContext, p.RepoOwner, p.RepoName, int(*comment.ID))
+			if err != nil {
+				return err
+			}
+		}
+		_, _, err = p.gitClient.Issues.CreateComment(p.gitContext, p.RepoOwner, p.RepoName, p.IssueNum, ic)
+		return err
+	}
+
+	fmt.Println("create")
 	_, _, err = p.gitClient.Issues.CreateComment(p.gitContext, p.RepoOwner, p.RepoName, p.IssueNum, ic)
 	return err
 }

@@ -51,8 +51,8 @@ func main() {
 			EnvVar: "PLUGIN_ISSUE_NUM,DRONE_PULL_REQUEST",
 		},
 		cli.StringFlag{
-			Name: "key",
-			Usage: "key to assign comment",
+			Name:   "key",
+			Usage:  "key to assign comment",
 			EnvVar: "PLUGIN_KEY",
 		},
 		cli.StringFlag{
@@ -66,9 +66,14 @@ func main() {
 			EnvVar: "PLUGIN_MESSAGE_FILE",
 		},
 		cli.BoolFlag{
-			Name: "update",
-			Usage: "update an existing comment that matches the key",
+			Name:   "update",
+			Usage:  "update an existing comment that matches the key",
 			EnvVar: "PLUGIN_UPDATE",
+		},
+		cli.BoolFlag{
+			Name:   "delete_create",
+			Usage:  "delete an existing comment that matches the key and create a new one",
+			EnvVar: "PLUGIN_DELETE_CREATE",
 		},
 
 		//
