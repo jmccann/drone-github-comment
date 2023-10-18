@@ -38,11 +38,17 @@ jobs:
       run: |
         go build -a -ldflags "-X main.version=${GITHUB_REF_NAME} -X main.rev=${GITHUB_SHA}"
 
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
     - name: Docker meta
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: tonglil/drone-github-comment
+        images: ${{ github.repository }}
         tags: |
           type=raw,value=latest,enable={{is_default_branch}}
           type=semver,pattern={{version}}
@@ -61,7 +67,8 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         context: .
-        platforms: linux/amd64
+        file: Dockerfile
+        platforms: linux/amd64,linux/arm64,linux/arm
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
