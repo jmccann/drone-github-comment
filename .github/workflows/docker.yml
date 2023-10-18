@@ -1,0 +1,67 @@
+name: Docker
+
+on:
+  push:
+    branches: [ "main" ]
+    tags:
+      - '*'
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CGO_ENABLED: 0
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      actions: write
+      checks: write
+      contents: write
+      deployments: write
+      id-token: write
+      issues: write
+      pull-requests: write
+      security-events: write
+      statuses: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version-file: 'go.mod'
+
+    - name: Build
+      run: |
+        go build -a -ldflags "-X main.version=${GITHUB_REF_NAME} -X main.rev=${GITHUB_SHA}"
+
+    - name: Docker meta
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: tonglil/drone-github-comment
+        tags: |
+          type=raw,value=latest,enable={{is_default_branch}}
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=semver,pattern={{major}}
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      if: ${{ github.event_name != 'pull_request' }}
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_TOKEN }}
+
+    # dry run, don't push image for pull_request event.
+    - name: Build and push
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        platforms: linux/amd64
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
