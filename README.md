@@ -17,7 +17,7 @@ Build the docker image with the following commands:
 
 ```
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -tags netgo
-docker build --rm=true -t jmccann/drone-github-comment .
+docker build --rm=true -t tonglil/drone-github-comment .
 ```
 
 Please note incorrectly building the image for the correct x64 linux and with
@@ -34,6 +34,6 @@ Execute from the working directory:
 
 ```
 docker run --rm \
-  jmccann/drone-github-comment:1 --repo-owner jmccann --repo-name drone-github-comment \
+  tonglil/drone-github-comment:1 --repo-owner tonglil --repo-name drone-github-comment \
   --pull-request 12 --api-key abcd1234 --message "Hello World!"
 ```

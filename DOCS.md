@@ -7,7 +7,7 @@ pipeline:
   github-comment:
     when:
       event: pull_request
-    image: jmccann/drone-github-comment:1
+    image: tonglil/drone-github-comment:1
     message: Hello World!
 ```
 
@@ -19,7 +19,7 @@ pipeline:
   github-comment:
     when:
       event: pull_request
-    image: jmccann/drone-github-comment:1
+    image: tonglil/drone-github-comment:1
     message: Hello World!
 +   update: true
 ```
@@ -36,7 +36,7 @@ pipeline:
   github-comment:
     when:
       event: pull_request
-    image: jmccann/drone-github-comment:1
+    image: tonglil/drone-github-comment:1
 -   message: Hello World!
 +   message_file: comment.file
 ```
