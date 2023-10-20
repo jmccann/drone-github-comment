@@ -36,7 +36,7 @@ jobs:
 
     - name: Build
       run: |
-        go build -a -ldflags "-X main.version=${GITHUB_REF_NAME} -X main.rev=${GITHUB_SHA}"
+        go build -a -ldflags "-X main.revision=${GITHUB_REF_NAME}-${GITHUB_SHA}"
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
