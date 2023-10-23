@@ -245,7 +245,7 @@ func hasSection(body, section string) bool {
 }
 
 func updateSection(body, section, message string) (string, error) {
-	expression, err := formatTmpl(section, "\\n", ".*")
+	expression, err := formatTmpl(section, "", ".*")
 	if err != nil {
 		return "", err
 	}
@@ -255,7 +255,7 @@ func updateSection(body, section, message string) (string, error) {
 		return "", err
 	}
 
-	re, err := regexp.Compile(expression)
+	re, err := regexp.Compile("(?s)" + expression)
 	if err != nil {
 		return "", err
 	}
