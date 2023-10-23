@@ -1,11 +1,14 @@
 package plugin
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"fmt"
 	"net/url"
+	"regexp"
 	"strings"
+	"text/template"
 
 	"github.com/google/go-github/github"
 	"github.com/urfave/cli"
@@ -17,6 +20,7 @@ type (
 		BaseURL   string
 		IssueNum  int
 		Key       string
+		Section   string
 		Message   string
 		Password  string
 		RepoName  string
@@ -34,6 +38,7 @@ func NewFromCLI(c *cli.Context) (*Plugin, error) {
 	p := Plugin{
 		BaseURL:   c.String("base-url"),
 		Key:       c.String("key"),
+		Section:   c.String("section"),
 		Message:   c.String("message"),
 		IssueNum:  c.Int("issue-num"),
 		Password:  c.String("password"),
@@ -71,11 +76,15 @@ func (p Plugin) Exec() error {
 		Body: &p.Message,
 	}
 
-	var err error
 	if p.Update {
-		// Append plugin comment ID to comment message so we can search for it later
-		message := fmt.Sprintf("%s\n<!-- id: %s -->\n", p.Message, p.Key)
-		ic.Body = &message
+		message, err := formatTmpl(p.Section, "\n", p.Message)
+		if err != nil {
+			return err
+		}
+
+		// Prepend plugin comment ID to comment message so we can search for it later
+		body := fmt.Sprintf("<!-- id: %s -->\n%s\n", p.Key, message)
+		ic.Body = &body
 
 		comment, err := p.Comment()
 		if err != nil {
@@ -83,12 +92,26 @@ func (p Plugin) Exec() error {
 		}
 
 		if comment != nil {
-			_, _, err = p.gitClient.Issues.EditComment(p.gitContext, p.RepoOwner, p.RepoName, int(*comment.ID), ic)
+			// If comment exists, filter comment body to look for section key
+			if hasSection(comment.GetBody(), p.Section) {
+				// If section exists, update it
+				body, err := updateSection(comment.GetBody(), p.Section, p.Message)
+				if err != nil {
+					return err
+				}
+				ic.Body = &body
+			} else {
+				// Otherwise add section
+				body := comment.GetBody() + "\n\n" + message
+				ic.Body = &body
+			}
+
+			_, _, err := p.gitClient.Issues.EditComment(p.gitContext, p.RepoOwner, p.RepoName, int(*comment.ID), ic)
 			return err
 		}
 	}
 
-	_, _, err = p.gitClient.Issues.CreateComment(p.gitContext, p.RepoOwner, p.RepoName, p.IssueNum, ic)
+	_, _, err := p.gitClient.Issues.CreateComment(p.gitContext, p.RepoOwner, p.RepoName, p.IssueNum, ic)
 	return err
 }
 
@@ -107,6 +130,11 @@ func (p *Plugin) init() error {
 	// Generate default plugin key if not specified
 	if p.Key == "" {
 		p.Key = defaultKey(*p)
+	}
+
+	// Generate default plugin section if not specified
+	if p.Section == "" {
+		p.Section = "main"
 	}
 
 	return nil
@@ -196,4 +224,41 @@ func (p Plugin) validate() error {
 	}
 
 	return nil
+}
+
+const tmpl = `<!-- start: {{.Section}} -->{{.NL}}{{.Message}}{{.NL}}<!-- end: {{.Section}} -->`
+
+func formatTmpl(section, newline, message string) (string, error) {
+	t := template.Must(template.New("tmpl").Parse(tmpl))
+	data := map[string]string{
+		"Section": section,
+		"NL":      newline,
+		"Message": message,
+	}
+	buf := &bytes.Buffer{}
+	err := t.Execute(buf, data)
+	return buf.String(), err
+}
+
+func hasSection(body, section string) bool {
+	return strings.Contains(body, fmt.Sprintf("<!-- start: %s -->", section))
+}
+
+func updateSection(body, section, message string) (string, error) {
+	expression, err := formatTmpl(section, "\\n", ".*")
+	if err != nil {
+		return "", err
+	}
+
+	msg, err := formatTmpl(section, "\n", message)
+	if err != nil {
+		return "", err
+	}
+
+	re, err := regexp.Compile(expression)
+	if err != nil {
+		return "", err
+	}
+
+	return re.ReplaceAllString(body, msg), nil
 }
