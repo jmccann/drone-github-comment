@@ -55,6 +55,11 @@ func main() {
 			EnvVar: "PLUGIN_KEY",
 		},
 		cli.StringFlag{
+			Name:   "section",
+			Usage:  "section to assign comment",
+			EnvVar: "PLUGIN_SECTION",
+		},
+		cli.StringFlag{
 			Name:   "message",
 			Usage:  "comment message",
 			EnvVar: "PLUGIN_MESSAGE",
@@ -66,7 +71,7 @@ func main() {
 		},
 		cli.BoolFlag{
 			Name:   "update",
-			Usage:  "update an existing comment that matches the key",
+			Usage:  "update an existing comment that matches the key and section",
 			EnvVar: "PLUGIN_UPDATE",
 		},
 
