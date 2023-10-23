@@ -19,7 +19,6 @@ func main() {
 	app.Action = run
 	app.Version = revision
 	app.Flags = []cli.Flag{
-
 		//
 		// plugin args
 		//
@@ -51,8 +50,8 @@ func main() {
 			EnvVar: "PLUGIN_ISSUE_NUM,DRONE_PULL_REQUEST",
 		},
 		cli.StringFlag{
-			Name: "key",
-			Usage: "key to assign comment",
+			Name:   "key",
+			Usage:  "key to assign comment",
 			EnvVar: "PLUGIN_KEY",
 		},
 		cli.StringFlag{
@@ -66,8 +65,8 @@ func main() {
 			EnvVar: "PLUGIN_MESSAGE_FILE",
 		},
 		cli.BoolFlag{
-			Name: "update",
-			Usage: "update an existing comment that matches the key",
+			Name:   "update",
+			Usage:  "update an existing comment that matches the key",
 			EnvVar: "PLUGIN_UPDATE",
 		},
 
@@ -102,7 +101,6 @@ func run(c *cli.Context) error {
 	if message == "" {
 		if _, err := os.Stat(c.String("message-file")); err == nil {
 			dat, err := ioutil.ReadFile(c.String("message-file"))
-
 			if err != nil {
 				return err
 			}

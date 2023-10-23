@@ -30,9 +30,9 @@ func TestPlugin(t *testing.T) {
 			defer gock.Off()
 
 			gock.New("http://server.com").
-			Post("/repos/test-org/test-repo/issues/12/comments").
-			Reply(201).
-			JSON(map[string]string{})
+				Post("/repos/test-org/test-repo/issues/12/comments").
+				Reply(201).
+				JSON(map[string]string{})
 
 			defer func() {
 				r := recover()
@@ -64,9 +64,9 @@ func TestPlugin(t *testing.T) {
 			defer gock.Off()
 
 			gock.New("http://server.com").
-			Post("/repos/test-org/test-repo/issues/12/comments").
-			Reply(201).
-			JSON(map[string]string{})
+				Post("/repos/test-org/test-repo/issues/12/comments").
+				Reply(201).
+				JSON(map[string]string{})
 
 			err := p.Exec()
 			g.Assert(err == nil).IsTrue(fmt.Sprintf("Received err: %s", err))
@@ -75,14 +75,14 @@ func TestPlugin(t *testing.T) {
 
 	g.Describe("updates existing comment", func() {
 		pl := Plugin{
-			BaseURL:        "http://server.com",
-			Message:        "test message",
-			IssueNum:       12,
-			Key:            "123",
-			RepoName:       "test-repo",
-			RepoOwner:      "test-org",
-			Update:         true,
-			Token:          "fake",
+			BaseURL:   "http://server.com",
+			Message:   "test message",
+			IssueNum:  12,
+			Key:       "123",
+			RepoName:  "test-repo",
+			RepoOwner: "test-org",
+			Update:    true,
+			Token:     "fake",
 		}
 		p, err := NewFromPlugin(pl)
 		if err != nil {
@@ -94,15 +94,15 @@ func TestPlugin(t *testing.T) {
 
 			// Get Comments
 			gock.New("http://server.com").
-			Get("repos/test-org/test-repo/issues/12/comments").
-			Reply(200).
-			File("../testdata/response/non-existing-comment.json")
+				Get("repos/test-org/test-repo/issues/12/comments").
+				Reply(200).
+				File("../testdata/response/non-existing-comment.json")
 
 			// Create new comment
 			gock.New("http://server.com").
-			Post("repos/test-org/test-repo/issues/12/comments").
-			Reply(201).
-			JSON(map[string]string{})
+				Post("repos/test-org/test-repo/issues/12/comments").
+				Reply(201).
+				JSON(map[string]string{})
 
 			err := p.Exec()
 
@@ -120,14 +120,14 @@ func TestPlugin(t *testing.T) {
 			defer gock.Off()
 
 			gock.New("http://server.com").
-			Get("repos/test-org/test-repo/issues/12/comments").
-			Reply(200).
-			File("../testdata/response/existing-comment.json")
+				Get("repos/test-org/test-repo/issues/12/comments").
+				Reply(200).
+				File("../testdata/response/existing-comment.json")
 
 			gock.New("http://server.com").
-			Patch("repos/test-org/test-repo/issues/comments/7").
-			Reply(200).
-			JSON(map[string]string{})
+				Patch("repos/test-org/test-repo/issues/comments/7").
+				Reply(200).
+				JSON(map[string]string{})
 
 			err := p.Exec()
 
@@ -145,20 +145,20 @@ func TestPlugin(t *testing.T) {
 			defer gock.Off()
 
 			gock.New("http://server.com").
-			Get("repos/test-org/test-repo/issues/12/comments").
-			Reply(200).
-			File("../testdata/response/existing-comment.json")
+				Get("repos/test-org/test-repo/issues/12/comments").
+				Reply(200).
+				File("../testdata/response/existing-comment.json")
 
 			// We do not expect this endpoint to get called
 			gock.New("http://server.com").
-			Post("repos/test-org/test-repo/issues/12/comments").
-			Reply(201).
-			JSON(map[string]string{})
+				Post("repos/test-org/test-repo/issues/12/comments").
+				Reply(201).
+				JSON(map[string]string{})
 
 			gock.New("http://server.com").
-			Patch("repos/test-org/test-repo/issues/comments/7").
-			Reply(200).
-			JSON(map[string]string{})
+				Patch("repos/test-org/test-repo/issues/comments/7").
+				Reply(200).
+				JSON(map[string]string{})
 
 			err := p.Exec()
 
@@ -178,17 +178,17 @@ func TestPlugin(t *testing.T) {
 			defer gock.Off()
 
 			gock.New("http://server.com").
-			Get("repos/test-org/test-repo/issues/12/comments").
-			Reply(200).
-			File("../testdata/response/existing-comment.json")
+				Get("repos/test-org/test-repo/issues/12/comments").
+				Reply(200).
+				File("../testdata/response/existing-comment.json")
 
 			gock.New("http://server.com").
-			Patch("repos/test-org/test-repo/issues/comments/7").
-			MatchType("json").
-			// Make sure we are sending expected generated message
-			File("../testdata/request/patch-comment.json").
-			Reply(201).
-			JSON(map[string]string{})
+				Patch("repos/test-org/test-repo/issues/comments/7").
+				MatchType("json").
+				// Make sure we are sending expected generated message
+				File("../testdata/request/patch-comment.json").
+				Reply(201).
+				JSON(map[string]string{})
 
 			err := p.Exec()
 

@@ -45,7 +45,6 @@ func NewFromCLI(c *cli.Context) (*Plugin, error) {
 	}
 
 	err := p.init()
-
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +54,6 @@ func NewFromCLI(c *cli.Context) (*Plugin, error) {
 
 func NewFromPlugin(p Plugin) (*Plugin, error) {
 	err := p.init()
-
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +78,6 @@ func (p Plugin) Exec() error {
 		ic.Body = &message
 
 		comment, err := p.Comment()
-
 		if err != nil {
 			return err
 		}
@@ -97,7 +94,6 @@ func (p Plugin) Exec() error {
 
 func (p *Plugin) init() error {
 	err := p.validate()
-
 	if err != nil {
 		return err
 	}
@@ -122,7 +118,6 @@ func (p *Plugin) initGitClient() error {
 	}
 
 	baseURL, err := url.Parse(p.BaseURL)
-
 	if err != nil {
 		return fmt.Errorf("Failed to parse base URL. %s", err)
 	}
@@ -148,7 +143,6 @@ func (p *Plugin) initGitClient() error {
 // Comment returns existing comment, nil if none exist
 func (p Plugin) Comment() (*github.IssueComment, error) {
 	comments, err := p.allIssueComments(p.gitContext)
-
 	if err != nil {
 		return nil, err
 	}
