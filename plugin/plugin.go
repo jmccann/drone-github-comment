@@ -102,7 +102,7 @@ func (p Plugin) Exec() error {
 				ic.Body = &body
 			} else {
 				// Otherwise add section
-				body := comment.GetBody() + "\n\n" + message
+				body := fmt.Sprintf("%s\n\n%s\n", comment.GetBody(), message)
 				ic.Body = &body
 			}
 
