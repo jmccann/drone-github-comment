@@ -1,3 +1,3 @@
 {
-  "body": "test message\n<!-- id: 123 -->\n"
+  "body": "<!-- id: 123 -->\n<!-- start: main -->\ntest message\n<!-- end: main -->\n"
 }

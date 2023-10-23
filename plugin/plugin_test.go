@@ -195,4 +195,107 @@ func TestPlugin(t *testing.T) {
 			g.Assert(err == nil).IsTrue(fmt.Sprintf("Received err: %s", err))
 		})
 	})
+
+	g.Describe("groups comments into sections", func() {
+		pl := Plugin{
+			BaseURL:   "http://server.com",
+			Message:   "test message",
+			IssueNum:  12,
+			Key:       "123",
+			Section:   "test-section",
+			RepoName:  "test-repo",
+			RepoOwner: "test-org",
+			Update:    true,
+			Token:     "fake",
+		}
+		p, err := NewFromPlugin(pl)
+		if err != nil {
+			g.Fail("Failed to create plugin for testing")
+		}
+
+		g.It("updates a comment's existing section", func() {
+			body := "<!-- start: test-section -->\nabc\n<!-- end: test-section -->"
+			message, err := updateSection(body, p.Section, p.Message)
+
+			g.Assert(err == nil).IsTrue(fmt.Sprintf("Received err: %s", err))
+			g.Assert(message).Equal("<!-- start: test-section -->\ntest message\n<!-- end: test-section -->")
+		})
+
+		g.It("creates a new comment with section if one does not exist", func() {
+			defer gock.Off()
+
+			// Get Comments
+			gock.New("http://server.com").
+				Get("repos/test-org/test-repo/issues/12/comments").
+				Reply(200).
+				File("../testdata/response/non-existing-comment.json")
+
+			// Create new comment with section
+			gock.New("http://server.com").
+				Post("repos/test-org/test-repo/issues/12/comments").
+				// TODO:
+				File("../testdata/request/patch-comment-section.json").
+				Reply(201).
+				JSON(map[string]string{})
+
+			err := p.Exec()
+			g.Assert(err == nil).IsTrue(fmt.Sprintf("Received err: %s", err))
+			g.Assert(gock.HasUnmatchedRequest()).IsFalse(fmt.Sprintf("Received unmatched requests: %v\n", gock.GetUnmatchedRequests()))
+
+			if !gock.IsDone() {
+				for _, m := range gock.Pending() {
+					g.Fail(fmt.Sprintf("Did not make expected request: %s(%s)", m.Request().Method, m.Request().URLStruct))
+				}
+			}
+		})
+
+		g.It("does not create a new comment section if one exists", func() {
+			defer gock.Off()
+
+			gock.New("http://server.com").
+				Get("repos/test-org/test-repo/issues/12/comments").
+				Reply(200).
+				File("../testdata/response/existing-comment-section.json")
+
+			gock.New("http://server.com").
+				Patch("repos/test-org/test-repo/issues/comments/7").
+				MatchType("json").
+				// Make sure we are sending expected generated message
+				File("../testdata/request/patch-comment-section.json").
+				Reply(201).
+				JSON(map[string]string{})
+
+			err := p.Exec()
+
+			g.Assert(err == nil).IsTrue(fmt.Sprintf("Received err: %s", err))
+		})
+
+		// TODO:
+		g.It("updates the correct comment section", func() {
+			defer gock.Off()
+
+			gock.New("http://server.com").
+				Get("repos/test-org/test-repo/issues/12/comments").
+				Reply(200).
+				File("../testdata/response/existing-comment-multiple-sections.json")
+
+			gock.New("http://server.com").
+				Patch("repos/test-org/test-repo/issues/comments/7").
+				// Make sure we are sending expected generated message
+				File("../testdata/request/patch-correct-comment-section.json").
+				Reply(200).
+				JSON(map[string]string{})
+
+			err := p.Exec()
+
+			g.Assert(err == nil).IsTrue(fmt.Sprintf("Received err: %s", err))
+			g.Assert(gock.HasUnmatchedRequest()).IsFalse(fmt.Sprintf("Received unmatched requests: %v\n", gock.GetUnmatchedRequests()))
+
+			if !gock.IsDone() {
+				for _, m := range gock.Pending() {
+					g.Fail(fmt.Sprintf("Did not make expected request: %s(%s)", m.Request().Method, m.Request().URLStruct))
+				}
+			}
+		})
+	})
 }

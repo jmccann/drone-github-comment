@@ -57,7 +57,7 @@
     "id": 7,
     "url": "https://api.github.com/repos/octocat/Hello-World/issues/comments/1",
     "html_url": "https://github.com/octocat/Hello-World/issues/1347#issuecomment-1",
-    "body": "<!-- id: 123 -->\n<!-- start: main -->\nMe too\n<!-- end: main -->\n",
+    "body": "<!-- id: 123 -->\n<!-- start: existing-section -->\nMe too\n<!-- end: existing-section -->\n<!-- start: test-section -->\nMe too\n<!-- end: test-section -->\n",
     "user": {
       "login": "octocat",
       "id": 1,
